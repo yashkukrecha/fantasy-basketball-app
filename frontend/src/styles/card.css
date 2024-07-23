@@ -1,0 +1,26 @@
+ul {
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: row;
+}
+
+li {
+  list-style: none;
+  width: 18%;
+  height: 100%;
+}
+
+.card {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+  margin: 1%;
+  padding: 2%;
+  text-align: center;
+}
+
+#selected {
+  border: 10px solid #007bff;
+}

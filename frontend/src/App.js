@@ -5,6 +5,8 @@ import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import Dashboard from "./Dashboard";
+import DraftPage from "./DraftPage";
+import PostDraftPage from "./PostDraftPage";
 
 const App = (props) => {
   return (
@@ -15,6 +17,8 @@ const App = (props) => {
           <Route exact path="/login" element={<LoginPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route exact path="/dashboard" element={<Dashboard />} />
+          <Route exact path="/draft" element={<DraftPage />} />
+          <Route exact path="/post_draft" element={<PostDraftPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

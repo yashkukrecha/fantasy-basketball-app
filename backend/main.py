@@ -7,6 +7,8 @@ from flask_wtf import FlaskForm
 from flask_login import login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
+from kmeans import group1, group2, group3, group4, group5
+import random
 
 # Validates whether or not the database worked
 @app.route('/players', methods=['GET'])
@@ -18,6 +20,11 @@ def get_players():
 def get_users():
     users = User.query.all()
     return jsonify([user.to_json() for user in users])
+
+@app.route('/drafts', methods=['GET'])
+def get_drafts():
+    drafts = Draft.query.all()
+    return jsonify([draft.to_json() for draft in drafts])
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -69,6 +76,20 @@ def logout():
     # print(current_user)
     logout_user()
     return jsonify({'message': 'Logged out successfully', 'status': 200})
+
+@app.route('/provide_draft', methods=['GET'])
+def provide_draft():
+    players = []
+    groups = [group1, group2, group3, group4, group5]
+    for i in range(5):
+        raw_list = random.sample(groups[i], 5)
+        json_list = [Player.query.filter_by(player_name=player).first().to_json() for player in raw_list]
+        players.append(json_list)
+    return jsonify({'players': players})
+        
+@app.route('/create_draft', methods=['POST'])
+def create_draft():
+    players = request.get_json().player_ids
  
 
 if __name__ == "__main__":

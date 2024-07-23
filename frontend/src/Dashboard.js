@@ -8,7 +8,7 @@ const Dashboard = (props) => {
   const { auth, logout } = useAuth();
 
   const handleLogout = async () => {
-    console.log(auth.user)
+    console.log(auth.user);
     const response = await fetch(`${backend}/logout`, {
       method: "POST",
     });
@@ -27,6 +27,7 @@ const Dashboard = (props) => {
     <div>
       <h1> Dashboard </h1>
       <p> {auth.user.username} </p>
+      <button onClick={() => navigate('/draft')}> Create a draft </button>
       <button onClick={handleLogout}> Logout </button>
     </div>
   );

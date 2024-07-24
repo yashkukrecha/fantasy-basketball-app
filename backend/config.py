@@ -7,10 +7,10 @@ import os
 from dotenv import load_dotenv
 
 app = Flask(__name__)
-CORS(app)
-
 load_dotenv()
 
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
+app.config['CORS_HEADERS'] = 'application/json'
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URL')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'

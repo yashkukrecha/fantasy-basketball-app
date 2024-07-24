@@ -7,6 +7,13 @@ const Dashboard = (props) => {
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
 
+  useEffect(() => {
+    console.log(auth);
+    if (auth.user == null) {
+      navigate("/");
+    }
+  }, []);
+
   const handleLogout = async () => {
     console.log(auth.user);
     const response = await fetch(`${backend}/logout`, {
@@ -26,8 +33,8 @@ const Dashboard = (props) => {
   return (
     <div>
       <h1> Dashboard </h1>
-      <p> {auth.user.username} </p>
-      <button onClick={() => navigate('/draft')}> Create a draft </button>
+      {auth.user && <p> {auth.user.username} </p>}
+      <button onClick={() => navigate("/draft")}> Create a draft </button>
       <button onClick={handleLogout}> Logout </button>
     </div>
   );

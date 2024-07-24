@@ -34,11 +34,11 @@ class Draft(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "player1": self.db.relationship('Player', foreign_keys=[self.player1]).to_json(),
-            "player2": self.db.relationship('Player', foreign_keys=[self.player2]).to_json(),
-            "player3": self.db.relationship('Player', foreign_keys=[self.player3]).to_json(),
-            "player4": self.db.relationship('Player', foreign_keys=[self.player4]).to_json(),
-            "player5": self.db.relationship('Player', foreign_keys=[self.player5]).to_json(),
+            "player1": Player.query.filter_by(id=self.player1).first().to_json(),
+            "player2": Player.query.filter_by(id=self.player2).first().to_json(),
+            "player3": Player.query.filter_by(id=self.player3).first().to_json(),
+            "player4": Player.query.filter_by(id=self.player4).first().to_json(),
+            "player5": Player.query.filter_by(id=self.player5).first().to_json(),
             "success": self.success
         }
 

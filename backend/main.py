@@ -8,7 +8,8 @@ from flask_login import login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from kmeans import group1, group2, group3, group4, group5
-import random
+from flask_cors import cross_origin
+import random, math
 
 # Validates whether or not the database worked
 @app.route('/players', methods=['GET'])
@@ -25,6 +26,16 @@ def get_users():
 def get_drafts():
     drafts = Draft.query.all()
     return jsonify([draft.to_json() for draft in drafts])
+
+@app.route('/delete_drafts', methods=['POST'])
+def delete_drafts():
+    try:
+        num_rows_deleted = db.session.query(Draft).delete()
+        db.session.commit()
+        return jsonify({'message': f'{num_rows_deleted} drafts deleted successfully', 'status': 200})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred while deleting drafts', 'error': str(e), 'status': 500})
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -88,10 +99,39 @@ def provide_draft():
     return jsonify({'players': players})
         
 @app.route('/create_draft', methods=['POST'])
+@cross_origin()
 def create_draft():
-    players = request.get_json().player_ids
- 
+    data = request.get_json()
+    player_ids = data.get('player_ids', [])
+    user_id = data.get('user_id')
+    sum = 0
+    for player in player_ids:
+        temp_player = Player.query.filter_by(id=player).first().to_json()
+        games = int(math.round(temp_player['games_pred'])) if temp_player['games_pred'] > 82 else 82
+        sum += ((temp_player['points_pred'] + temp_player['rebounds_pred'] + temp_player['assists_pred']) * games)
+    
+    new_draft = Draft(
+        user_id=user_id,
+        player1=player_ids[0],
+        player2=player_ids[1],
+        player3=player_ids[2],
+        player4=player_ids[3],
+        player5=player_ids[4],
+        success=sum
+    )
+    db.session.add(new_draft)
+    db.session.commit()
+    return jsonify({'players': player_ids, 'status': 201})
 
+@app.route('/get_latest_draft', methods=['POST'])
+@cross_origin()
+def get_latest_draft():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    user = User.query.filter_by(id=user_id).first().to_json()
+    draft = Draft.query.filter_by(id=user['drafts'][-1]).first().to_json()
+    return jsonify({'draft': draft, 'status': 200})
+    
 if __name__ == "__main__":
     # Creating the databases and adding the player information
     with app.app_context(): 

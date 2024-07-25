@@ -6,22 +6,35 @@ import "./styles/card.css";
 const DraftPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const { auth, login } = useAuth();
   const [players, setPlayers] = useState([[]]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState([null, null, null, null, null]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (auth.user == null) {
-      navigate("/");
-    } else {
-      fetch(`${backend}/provide_draft`)
-        .then((response) => response.json())
-        .then((data) => {
-          setPlayers(data.players);
-        });
+    if (!auth.user) {
+      // Check to see if user is logged in
+      fetch(`${backend}/@me`, {
+        credentials: "include",
+      }).then((response) => {
+        if (response.status !== 200) {
+          navigate("/");
+          return;
+        } else {
+          login(response.json().user);
+        }
+      });
     }
+
+    // Randomly generate the draft class
+    fetch(`${backend}/provide_draft`, {
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setPlayers(data.players);
+      });
   }, []);
 
   useEffect(() => {
@@ -49,22 +62,22 @@ const DraftPage = (props) => {
       setError("Must select one player in each row before moving on.");
       return;
     } else {
-      console.log(auth);
       const response = await fetch(`${backend}/create_draft`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 'player_ids': selected, 'user_id': auth.user.id }),
+        credentials: "include",
+        body: JSON.stringify({ player_ids: selected }),
       });
 
-      const data = response.json();
-      if (data.status === 400) {
+      if (response.status !== 201) {
         setError("There was an error creating your draft. Please try again.");
       } else {
-        console.log(data)
+        const data = await response.json();
+        console.log(data);
         setError("");
-        navigate("/post_draft");
+        navigate("/post_draft", { state: { id: data.draft_id } });
       }
     }
   };
@@ -94,6 +107,10 @@ const DraftPage = (props) => {
       {index < 4 && <button onClick={nextStage}>Next</button>}
       {index === 4 && <button onClick={createDraft}>Complete Draft</button>}
       {error && <p> Error: {error} </p>}
+      <button onClick={() => navigate("/dashboard")}>
+        {" "}
+        Back to dashboard{" "}
+      </button>
     </div>
   );
 };

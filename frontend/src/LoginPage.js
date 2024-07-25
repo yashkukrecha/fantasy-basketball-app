@@ -1,8 +1,8 @@
-import { React, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const LoginPage = (props) => {
+const LoginPage = () => {
   const backend = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -17,16 +17,16 @@ const LoginPage = (props) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username: username, password: password }),
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
     });
-    const data = await response.json();
-    if (data.status === 401) {
+    const data = await response.json()
+    if (response.status === 401) {
       setError(data.message);
     } else {
       setError("");
       login(data.user);
       navigate("/dashboard");
-      console.log(data.user);
     }
   };
 

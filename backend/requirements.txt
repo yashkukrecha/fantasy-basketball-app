@@ -1,0 +1,14 @@
+Flask     
+Flask-Bcrypt     
+Flask-Cors     
+Flask-Login     
+Flask-Session     
+Flask-SQLAlchemy
+joblib
+matplotlib
+numpy
+pip
+python-dotenv
+redis
+scikit-learn
+SQLAlchemy

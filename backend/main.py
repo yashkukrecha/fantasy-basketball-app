@@ -1,15 +1,61 @@
 # Routes
-from flask import request, jsonify
-from config import app, db, bcrypt, login_manager
+from flask import request, jsonify, session
+from config import app, db, bcrypt, server_session
 from models import User, Draft, Player
 import pandas as pd
-from flask_wtf import FlaskForm
-from flask_login import login_user, logout_user, current_user, login_required
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
 from kmeans import group1, group2, group3, group4, group5
-from flask_cors import cross_origin
 import random, math
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    # validation
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required'}), 400
+    if len(username) < 4 or len(username) > 20:
+        return jsonify({'message': 'Username must be in between 4 and 20 characters'}), 400
+    if len(password) < 8 or len(password) > 20:
+        return jsonify({'message': 'Password must be in between 8 and 20 characters'}), 400
+    # check pre-existing usernames
+    existing_user_username = User.query.filter_by(username=username).first()
+    if existing_user_username:
+        return jsonify({'message': 'Username is already in use'}), 400
+    # adding the user
+    hashed_password = bcrypt.generate_password_hash(password)
+    new_user = User(username=username, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    session["user_id"] = new_user.id
+    return jsonify({'user': new_user.to_json(), 'status': 201})
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    # check pre-existing usernames
+    user = User.query.filter_by(username=username).first()
+    if user and bcrypt.check_password_hash(user.password, password):
+        session["user_id"] = user.id
+        return jsonify({'message': 'Logged in successfully', 'user': user.to_json()}), 200
+    return jsonify({'message': 'Incorrect username or password'}), 401
+
+@app.route('/@me', methods=['GET'])
+def get_current_user():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({'Error': 'Unauthorized'}), 401
+    user = User.query.filter_by(id=user_id).first().to_json()
+    return jsonify({'user': user}), 200
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id')
+    return jsonify({'message': 'Successfully logged out'}), 200
+
+
 
 # Validates whether or not the database worked
 @app.route('/players', methods=['GET'])
@@ -22,71 +68,33 @@ def get_users():
     users = User.query.all()
     return jsonify([user.to_json() for user in users])
 
+@app.route('/delete_users', methods=['POST'])
+def delete_users():
+    try:
+        num_rows_deleted = db.session.query(User).delete()
+        db.session.commit()
+        return jsonify({'message': f'{num_rows_deleted} users deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred while deleting users', 'error': str(e)}), 500
+
 @app.route('/drafts', methods=['GET'])
 def get_drafts():
     drafts = Draft.query.all()
-    return jsonify([draft.to_json() for draft in drafts])
+    return jsonify(len(drafts))
 
 @app.route('/delete_drafts', methods=['POST'])
 def delete_drafts():
     try:
         num_rows_deleted = db.session.query(Draft).delete()
         db.session.commit()
-        return jsonify({'message': f'{num_rows_deleted} drafts deleted successfully', 'status': 200})
+        return jsonify({'message': f'{num_rows_deleted} drafts deleted successfully'}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'An error occurred while deleting drafts', 'error': str(e), 'status': 500})
+        return jsonify({'message': 'An error occurred while deleting drafts', 'error': str(e)}), 500
 
-@app.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
 
-    # validation
-    if not username or not password:
-        return jsonify({'message': 'Username and password are required', 'status': 400})
-    if len(username) < 4 or len(username) > 20:
-        return jsonify({'message': 'Username must be in between 4 and 20 characters', 'status': 400})
-    if len(password) < 8 or len(password) > 20:
-        return jsonify({'message': 'Password must be in between 8 and 20 characters', 'status': 400})
-    
-    # check pre-existing usernames
-    existing_user_username = User.query.filter_by(username=username).first()
-    if existing_user_username:
-        return jsonify({'message': 'Username is already in use', 'status': 400})
-    
-    # adding the user
-    hashed_password = bcrypt.generate_password_hash(password)
-    new_user = User(username=username, password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'user': new_user.to_json(), 'status': 201})
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    
-    # check pre-existing usernames
-    user = User.query.filter_by(username=username).first()
-    if user and bcrypt.check_password_hash(user.password, password):
-        login_user(user)
-        return jsonify({'message': 'Logged in successfully', 'user': user.to_json(), 'status': 200})
-        
-    return jsonify({'message': 'Incorrect username or password', 'status': 401})
-
-@app.route('/logout', methods=['POST'])
-# @login_required
-def logout():
-    # print(current_user)
-    logout_user()
-    return jsonify({'message': 'Logged out successfully', 'status': 200})
 
 @app.route('/provide_draft', methods=['GET'])
 def provide_draft():
@@ -99,11 +107,10 @@ def provide_draft():
     return jsonify({'players': players})
         
 @app.route('/create_draft', methods=['POST'])
-@cross_origin()
 def create_draft():
     data = request.get_json()
     player_ids = data.get('player_ids', [])
-    user_id = data.get('user_id')
+    user_id = session.get("user_id")
     sum = 0
     for player in player_ids:
         temp_player = Player.query.filter_by(id=player).first().to_json()
@@ -121,17 +128,27 @@ def create_draft():
     )
     db.session.add(new_draft)
     db.session.commit()
-    return jsonify({'players': player_ids, 'status': 201})
+    return jsonify({'draft_id': new_draft.id}), 201
 
-@app.route('/get_latest_draft', methods=['POST'])
-@cross_origin()
-def get_latest_draft():
+@app.route('/get_draft', methods=['POST'])
+def get_draft():
     data = request.get_json()
-    user_id = data.get('user_id')
+    draft_id = data.get('draft_id')
+    draft = Draft.query.filter_by(id=draft_id).first().to_json()
+    return jsonify({'draft': draft}), 200
+
+@app.route('/get_all_drafts', methods=['GET'])
+def get_all_drafts():
+    user_id = session.get("user_id")
     user = User.query.filter_by(id=user_id).first().to_json()
-    draft = Draft.query.filter_by(id=user['drafts'][-1]).first().to_json()
-    return jsonify({'draft': draft, 'status': 200})
-    
+    draft_list = []
+    for draft in user["drafts"]:
+        draft_list.append(Draft.query.filter_by(id=draft).first().to_json())
+    return jsonify({'drafts': draft_list, 'status': 200})
+        
+
+
+
 if __name__ == "__main__":
     # Creating the databases and adding the player information
     with app.app_context(): 

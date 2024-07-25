@@ -17,10 +17,11 @@ const RegisterPage = (props) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ username: username, password: password }),
     });
     const data = await response.json();
-    if (data.status === 400) {
+    if (response.status === 400) {
       setError(data.message);
     } else {
       setError("");

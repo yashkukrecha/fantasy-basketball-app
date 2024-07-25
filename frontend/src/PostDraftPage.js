@@ -1,44 +1,55 @@
 import { React, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 const PostDraftPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const { auth, login } = useAuth();
+  const { state } = useLocation();
   const [success, setSuccess] = useState(0);
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    if (auth.user == null) {
-      navigate("/");
-    } else {
-      fetch(`${backend}/get_latest_draft`, {
-        method: "POST", // not technically a POST request, but required to allow body
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user_id: auth.user.id }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          var temp_players = [];
-          temp_players.push(data.draft.player1);
-          temp_players.push(data.draft.player2);
-          temp_players.push(data.draft.player3);
-          temp_players.push(data.draft.player4);
-          temp_players.push(data.draft.player5);
-          setPlayers(temp_players);
-          setSuccess(data.draft.success);
-        });
+    if (!auth.user) {
+      // Check to see if user is logged in
+      fetch(`${backend}/@me`, {
+        credentials: "include",
+      }).then((response) => {
+        if (response.status !== 200) {
+          navigate("/");
+          return;
+        } else {
+          login(response.json().user);
+        }
+      });
     }
+
+    // Get one specific draft for the user
+    fetch(`${backend}/get_draft`, {
+      method: "POST", // not technically a POST request, but required to allow body
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ draft_id: state.id }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        var temp_players = [];
+        temp_players.push(data.draft.player1);
+        temp_players.push(data.draft.player2);
+        temp_players.push(data.draft.player3);
+        temp_players.push(data.draft.player4);
+        temp_players.push(data.draft.player5);
+        setPlayers(temp_players);
+        setSuccess(data.draft.success);
+      });
   }, []);
 
   const playerItems = players.map((player) => (
     <li key={player.id}>
-      <div
-        className="card"
-      >
+      <div className="card">
         <h4> {player.player_name} </h4>
         <p> {player.team_name} </p>
         <p>

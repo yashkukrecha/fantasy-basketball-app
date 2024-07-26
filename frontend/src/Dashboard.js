@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import "./styles/card.css";
 
 const Dashboard = () => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -46,17 +47,26 @@ const Dashboard = () => {
 
   const draftItems = drafts.map((draft) => (
     <li key={draft.id}>
-      <div onClick={() => navigate("/post_draft", { state: { id: draft.id } })}>Draft: {draft.success}</div>
+      <div
+        onClick={() => navigate("/post_draft", { state: { id: draft.id } })}
+        style={{ cursor: "pointer" }}
+      >
+        <p>Draft Success: {draft.success.toFixed(1)}</p>
+      </div>
     </li>
   ));
 
   return (
-    <div>
+    <div className="column-container">
       <h1> Dashboard </h1>
-      {auth.user && <p> {auth.user.username} </p>}
-      <ul>{draftItems}</ul>
-      <button onClick={() => navigate("/draft")}> Create a draft </button>
-      <button onClick={handleLogout}> Logout </button>
+      {auth.user && <h3> {auth.user.username}'s drafts: </h3>}
+      <p>(Click on a draft to learn more)</p>
+      <br></br>
+      <ul className="draftul">{draftItems}</ul>
+      <div>
+        <button onClick={() => navigate("/draft")}> Create a draft </button>
+        <button onClick={handleLogout}> Logout </button>
+      </div>
     </div>
   );
 };

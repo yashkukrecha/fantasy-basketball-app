@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -20,9 +21,9 @@ const LoginPage = () => {
       credentials: "include",
       body: JSON.stringify({ username, password }),
     });
-    const data = await response.json()
+    const data = await response.json();
     if (response.status === 401) {
-      setError(data.message);
+      setError("Error: " + data.message);
     } else {
       setError("");
       login(data.user);
@@ -31,29 +32,31 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h1> Login </h1>
+    <div className="column-container">
+      <h1> Sign In </h1>
       <form name="authenticate" onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
+        <div className="row-container">
+          <label>Username</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
-        <div>
-          <label>Password:</label>
+        <div className="row-container">
+          <label>Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Login</button>
+        <button style={{ marginTop: "7%" }} type="submit">
+          Login
+        </button>
       </form>
-      {error && <p>{error}</p>}
-      <button onClick={() => navigate("/register")}> Register </button>
+      {error && <p className="error">{error}</p>}
+      <Link to="/register" style={{marginTop: '1%'}}> Don't have an account? Sign up here </Link>
     </div>
   );
 };

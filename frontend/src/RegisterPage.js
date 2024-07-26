@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const RegisterPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -31,29 +32,31 @@ const RegisterPage = (props) => {
   };
 
   return (
-    <div>
-      <h1> Register </h1>
+    <div className="column-container">
+      <h1> Sign Up </h1>
       <form name="authenticate" onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
+        <div className="row-container">
+          <label>Username</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
-        <div>
-          <label>Password:</label>
+        <div className="row-container">
+          <label>Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Register</button>
+        <button style={{ marginTop: "7%" }} type="submit">
+          Register
+        </button>
       </form>
-      {error && <p>{error}</p>}
-      <button onClick={() => navigate("/login")}> Login </button>
+      {error && <p className="error">{error}</p>}
+      <Link to="/login" style={{marginTop: '1%'}}> Already have an account? Login here </Link>
     </div>
   );
 };

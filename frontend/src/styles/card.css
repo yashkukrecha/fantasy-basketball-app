@@ -1,13 +1,28 @@
-ul {
+.playersul {
   padding: 0px;
   margin: 0px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+}
+
+.draftul {
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 li {
   list-style: none;
-  width: 18%;
+  width: 20%;
   height: 100%;
 }
 
@@ -19,8 +34,12 @@ li {
   margin: 1%;
   padding: 2%;
   text-align: center;
+  border: 1px solid #ef955d;
+  box-shadow: 8px 4px 8px rgba(168, 72, 28, 0.5);
+  border-radius: 5px;
 }
 
 #selected {
-  border: 10px solid #007bff;
+  border: 3px solid #f3b976;
+  box-shadow: 8px 4px 8px rgba(224, 162, 132, 0.884);
 }

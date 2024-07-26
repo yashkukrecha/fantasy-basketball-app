@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import LoadingIcons from "react-loading-icons";
 
 const PostDraftPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -23,6 +24,12 @@ const PostDraftPage = (props) => {
           login(response.json().user);
         }
       });
+    }
+
+    // If user tries to manually navigate to this page
+    if (!state) {
+      navigate("/dashboard");
+      return;
     }
 
     // Get one specific draft for the user
@@ -50,21 +57,41 @@ const PostDraftPage = (props) => {
   const playerItems = players.map((player) => (
     <li key={player.id}>
       <div className="card">
-        <h4> {player.player_name} </h4>
+        <h3> {player.player_name} </h3>
         <p> {player.team_name} </p>
         <p>
-          {" "}
           {player.player_age} | {player.player_height.toFixed(1)} cm |{" "}
-          {player.player_weight.toFixed(1)} kgs{" "}
+          {player.player_weight.toFixed(1)} kgs
         </p>
+        <br></br>
+        <p>PPG prediction: {player.points_pred.toFixed(1)}</p>
+        <p>APG prediction: {player.assists_pred.toFixed(1)}</p>
+        <p>RPG prediction: {player.rebounds_pred.toFixed(1)}</p>
+        <p>Games played prediction: {player.games_pred.toFixed(1)}</p>
       </div>
     </li>
   ));
 
+  if (players.length === 0) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <LoadingIcons.ThreeDots />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1> Post Draft </h1>
-      <ul>{playerItems}</ul>
+      <ul className="playersul">{playerItems}</ul>
+      <br></br>
       <p> Success level: {success.toFixed(1)} </p>
       <button onClick={() => navigate("/dashboard")}> Back to Dashboard</button>
     </div>

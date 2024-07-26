@@ -89,28 +89,40 @@ const DraftPage = (props) => {
         id={`${player.id === selected[index] ? "selected" : ""}`}
         onClick={() => handleCardClick(player.id, index)}
       >
-        <h4> {player.player_name} </h4>
+        <h3> {player.player_name} </h3>
         <p> {player.team_name} </p>
         <p>
-          {" "}
           {player.player_age} | {player.player_height.toFixed(1)} cm |{" "}
-          {player.player_weight.toFixed(1)} kgs{" "}
+          {player.player_weight.toFixed(1)} kgs
         </p>
+        <br></br>
+        <p>
+          PPG: {player.points.toFixed(1)} (
+          {(player.shooting_percent * 100).toFixed(1)}%)
+        </p>
+        <p>APG: {player.assists.toFixed(1)}</p>
+        <p>RPG: {player.rebounds.toFixed(1)}</p>
+        <p>Games played: {player.games_played.toFixed(1)}</p>
+        <p>Net rating: {player.net_rating.toFixed(1)}</p>
       </div>
     </li>
   ));
 
   return (
-    <div>
+    <div className="column-container">
       <h1>Draft Page</h1>
-      <ul>{playerItems}</ul>
-      {index < 4 && <button onClick={nextStage}>Next</button>}
-      {index === 4 && <button onClick={createDraft}>Complete Draft</button>}
-      {error && <p> Error: {error} </p>}
-      <button onClick={() => navigate("/dashboard")}>
-        {" "}
-        Back to dashboard{" "}
-      </button>
+      <ul className="playersul">{playerItems}</ul>
+      {error && <p className="error"> Error: {error} </p>}
+      <div style={{marginTop: '1%'}}>
+        {index < 4 ? (
+          <button onClick={nextStage}>Next</button>
+        ) : (
+          <button onClick={createDraft}>Complete Draft</button>
+        )}
+        <button onClick={() => navigate("/dashboard")}>
+          Dashboard
+        </button>
+      </div>
     </div>
   );
 };

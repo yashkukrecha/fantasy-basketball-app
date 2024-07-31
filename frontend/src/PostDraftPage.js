@@ -2,6 +2,7 @@ import { React, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import LoadingIcons from "react-loading-icons";
+import PlayerPage from "./PlayerPage";
 
 const PostDraftPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -10,6 +11,8 @@ const PostDraftPage = (props) => {
   const { state } = useLocation();
   const [success, setSuccess] = useState(0);
   const [players, setPlayers] = useState([]);
+  const [clicked, setClicked] = useState(false);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (!auth.user) {
@@ -54,9 +57,14 @@ const PostDraftPage = (props) => {
       });
   }, []);
 
+  const handleClick = (index) => {
+    setClicked(true);
+    setIndex(index);
+  };
+
   const playerItems = players.map((player) => (
-    <li key={player.id}>
-      <div className="card">
+    <li style={{width: '20%'}}  key={player.id}>
+      <div className="card" onClick={() => handleClick(player.id)}>
         <h3> {player.player_name} </h3>
         <p> {player.team_name} </p>
         <p>
@@ -67,7 +75,7 @@ const PostDraftPage = (props) => {
         <p>PPG prediction: {player.points_pred.toFixed(1)}</p>
         <p>APG prediction: {player.assists_pred.toFixed(1)}</p>
         <p>RPG prediction: {player.rebounds_pred.toFixed(1)}</p>
-        <p>Games played prediction: {player.games_pred.toFixed(1)}</p>
+        <p>GP prediction: {player.games_pred.toFixed(1)}</p>
       </div>
     </li>
   ));
@@ -90,6 +98,7 @@ const PostDraftPage = (props) => {
   return (
     <div>
       <h1> Post Draft </h1>
+      {clicked && <PlayerPage setTrigger={setClicked} index={index}/>}
       <ul className="playersul">{playerItems}</ul>
       <br></br>
       <p> Success level: {success.toFixed(1)} </p>

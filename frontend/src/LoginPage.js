@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -10,6 +10,19 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
+
+  useEffect(() => {
+    fetch(`${backend}/@me`, {
+      credentials: "include",
+    }).then((response) => {
+      console.log(response);
+      if (response.status === 200) {
+        const data = response.json();
+        login(data.user);
+        navigate("/dashboard");
+      }
+    });
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -56,7 +69,10 @@ const LoginPage = () => {
         </button>
       </form>
       {error && <p className="error">{error}</p>}
-      <Link to="/register" style={{marginTop: '1%'}}> Don't have an account? Sign up here </Link>
+      <Link to="/register" style={{ marginTop: "1%" }}>
+        {" "}
+        Don't have an account? Sign up here{" "}
+      </Link>
     </div>
   );
 };

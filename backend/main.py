@@ -145,8 +145,22 @@ def get_all_drafts():
     for draft in user["drafts"]:
         draft_list.append(Draft.query.filter_by(id=draft).first().to_json())
     return jsonify({'drafts': draft_list, 'status': 200})
-        
 
+@app.route('/delete_draft', methods=['POST'])
+def delete_draft():
+    data = request.get_json()
+    draft_id = data.get('draft_id')
+    draft = Draft.query.filter_by(id=draft_id).first()
+    db.session.delete(draft)
+    db.session.commit()
+    return jsonify({'message': 'draft deleted successfully'}), 200
+
+@app.route('/get_player', methods=['POST'])
+def get_player():
+    data = request.get_json()
+    player_id = data.get('player_id')
+    player = Player.query.filter_by(id=player_id).first().to_json()
+    return jsonify({'player': player}), 200
 
 
 if __name__ == "__main__":

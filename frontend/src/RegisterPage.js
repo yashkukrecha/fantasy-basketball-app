@@ -55,7 +55,7 @@ const RegisterPage = (props) => {
           Register
         </button>
       </form>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error">Error: {error}</p>}
       <Link to="/login" style={{marginTop: '1%'}}> Already have an account? Login here </Link>
     </div>
   );

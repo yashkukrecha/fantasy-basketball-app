@@ -32,12 +32,13 @@ h3 {
 
 button {
   margin: 2%;
-  border: 2px solid #767676;
+  border: 2px solid #adadad;
   border-radius: 5px;
   padding-left: 10px;
   padding-right: 10px;
   cursor: pointer;
   font-size: 20px;
+  background-color:rgb(154, 103, 196);
 }
 
 input {

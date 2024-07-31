@@ -82,8 +82,14 @@ const DraftPage = (props) => {
     }
   };
 
+  const handleLeave = () => {
+    if (window.confirm("Your draft will be lost if you return to the dashboard.")) {
+      navigate('/dashboard')
+    }
+  }
+
   const playerItems = players[index].map((player) => (
-    <li key={player.id}>
+    <li style={{width: '20%'}} key={player.id}>
       <div
         className="card"
         id={`${player.id === selected[index] ? "selected" : ""}`}
@@ -119,7 +125,7 @@ const DraftPage = (props) => {
         ) : (
           <button onClick={createDraft}>Complete Draft</button>
         )}
-        <button onClick={() => navigate("/dashboard")}>
+        <button onClick={handleLeave}>
           Dashboard
         </button>
       </div>

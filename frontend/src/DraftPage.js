@@ -1,12 +1,11 @@
 import { React, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import "./styles/card.css";
 
 const DraftPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
-  const { auth, login } = useAuth();
+  const { auth } = useAuth();
   const [players, setPlayers] = useState([[]]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState([null, null, null, null, null]);
@@ -14,19 +13,9 @@ const DraftPage = (props) => {
 
   useEffect(() => {
     if (!auth.user) {
-      // Check to see if user is logged in
-      fetch(`${backend}/@me`, {
-        credentials: "include",
-      }).then((response) => {
-        if (response.status !== 200) {
-          navigate("/");
-          return;
-        } else {
-          login(response.json().user);
-        }
-      });
+      navigate("/");
+      return;
     }
-
     // Randomly generate the draft class
     fetch(`${backend}/provide_draft`, {
       credentials: "include",
@@ -83,13 +72,15 @@ const DraftPage = (props) => {
   };
 
   const handleLeave = () => {
-    if (window.confirm("Your draft will be lost if you return to the dashboard.")) {
-      navigate('/dashboard')
+    if (
+      window.confirm("Your draft will be lost if you return to the dashboard.")
+    ) {
+      navigate("/dashboard");
     }
-  }
+  };
 
   const playerItems = players[index].map((player) => (
-    <li style={{width: '20%'}} key={player.id}>
+    <li style={{ width: "20%" }} key={player.id}>
       <div
         className="card"
         id={`${player.id === selected[index] ? "selected" : ""}`}
@@ -119,15 +110,13 @@ const DraftPage = (props) => {
       <h1>Draft Page</h1>
       <ul className="playersul">{playerItems}</ul>
       {error && <p className="error"> Error: {error} </p>}
-      <div style={{marginTop: '1%'}}>
+      <div style={{ marginTop: "1%" }}>
         {index < 4 ? (
           <button onClick={nextStage}>Next</button>
         ) : (
           <button onClick={createDraft}>Complete Draft</button>
         )}
-        <button onClick={handleLeave}>
-          Dashboard
-        </button>
+        <button onClick={handleLeave}>Dashboard</button>
       </div>
     </div>
   );

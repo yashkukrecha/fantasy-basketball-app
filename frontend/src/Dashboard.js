@@ -3,33 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faTrash } from "@fortawesome/free-solid-svg-icons";
-import "./styles/card.css";
 
 const Dashboard = () => {
   const backend = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
-  const { auth, logout, login } = useAuth();
+  const { auth, logout } = useAuth();
   const [drafts, setDrafts] = useState([]);
   const [bestDraft, setBestDraft] = useState(0);
 
   useEffect(() => {
     if (!auth.user) {
-      // Check to see if user is logged in
-      fetch(`${backend}/@me`, {
-        credentials: "include",
-      })
-        .then((response) => {
-          if (response.status !== 200) {
-            navigate("/");
-            return;
-          }
-        })
-        .then((data) => data.json())
-        .then((data) => {
-          login(data.user);
-        });
+      navigate("/");
+      return;
     }
-
     // Get all the drafts for the user
     fetch(`${backend}/get_all_drafts`, {
       method: "GET",
@@ -96,7 +82,7 @@ const Dashboard = () => {
         {bestDraft === draft.id && (
           <FontAwesomeIcon
             icon={faStar}
-            className="fa-2x"
+            size="2xl"
             style={{
               position: "absolute",
               bottom: "15px",
@@ -105,7 +91,7 @@ const Dashboard = () => {
           />
         )}
         <FontAwesomeIcon
-          className="fa-2x"
+          size="2xl"
           icon={faTrash}
           id="trash-icon"
           style={{ position: "absolute", top: "20px", right: "25px" }}
@@ -127,8 +113,14 @@ const Dashboard = () => {
   return (
     <div className="column-container">
       <h1> Dashboard </h1>
+      <img
+        src={require("./icons/default-pfp.png")}
+        alt="user profile"
+        id="dashboard-pfp"
+        onClick={() => navigate("/profile")}
+      />
       {auth.user && <h3> {auth.user.username}'s drafts: </h3>}
-      <p>(Click on a draft to learn more)</p>
+      {bestDraft !== 0 && <p>(Click on a draft to learn more)</p>}
       <br></br>
       <ul className="draftul">{draftItems}</ul>
       <br></br>

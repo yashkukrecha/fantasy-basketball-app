@@ -15,20 +15,6 @@ const PostDraftPage = (props) => {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (!auth.user) {
-      // Check to see if user is logged in
-      fetch(`${backend}/@me`, {
-        credentials: "include",
-      }).then((response) => {
-        if (response.status !== 200) {
-          navigate("/");
-          return;
-        } else {
-          login(response.json().user);
-        }
-      });
-    }
-
     // If user tries to manually navigate to this page
     if (!state) {
       navigate("/dashboard");

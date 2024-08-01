@@ -4,7 +4,6 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import LoadingIcons from "react-loading-icons";
 import { useNavigate } from "react-router-dom";
 import BarChart from "./BarChart";
-import "./styles/player.css";
 
 const PlayerPage = (props) => {
   const backend = process.env.REACT_APP_BACKEND_URL;

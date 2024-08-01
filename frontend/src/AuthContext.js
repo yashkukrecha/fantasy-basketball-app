@@ -16,8 +16,14 @@ export const AuthProvider = ({ children }) => {
     setAuth({ user: null, isAuthenticated: false });
   };
 
+  const changeUsername = (username) => {
+    var tempUser = auth.user;
+    tempUser.username = username;
+    setAuth({ tempUser, isAuthenticated: true });
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, changeUsername }}>
       {children}
     </AuthContext.Provider>
   );

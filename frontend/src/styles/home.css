@@ -5,3 +5,23 @@
   padding-left: 10px;
   padding-right: 10px;
 }
+
+@keyframes roll {
+  0% {
+    transform: translateX(-100%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(calc(100vw + 300px)) rotate(720deg);
+  }
+}
+
+#home-icon {
+  width: 200px;
+  height: 200px;
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+  bottom: 0%;
+  left: -20%;
+  animation: roll 5s ease infinite;
+}

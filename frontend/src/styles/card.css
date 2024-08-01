@@ -39,6 +39,12 @@ li {
   box-shadow: 4px 4px 8px rgba(168, 72, 28, 0.5);
   border-radius: 5px;
   cursor: pointer;
+  transition: border-color 0.5s, box-shadow 0.5s;
+}
+
+.card:hover {
+  border: 1px solid #f8f8f7;
+  box-shadow: 6px 6px 12px rgba(214, 169, 149, 0.7);
 }
 
 #selected {
@@ -53,4 +59,4 @@ li {
 
 #trash-icon:hover {
   opacity: 1;
-} 
+}

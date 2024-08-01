@@ -11,19 +11,6 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
 
-  useEffect(() => {
-    fetch(`${backend}/@me`, {
-      credentials: "include",
-    }).then((response) => {
-      console.log(response);
-      if (response.status === 200) {
-        const data = response.json();
-        login(data.user);
-        navigate("/dashboard");
-      }
-    });
-  }, []);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const response = await fetch(`${backend}/login`, {

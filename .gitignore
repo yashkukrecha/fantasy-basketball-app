@@ -28,6 +28,7 @@
 # Python and Flask files
 /backend/__pycache__/
 /backend/instance/
+/backend/migrations/
 /backend/.env
 /backend/*.pyc
 /backend/*.pyo

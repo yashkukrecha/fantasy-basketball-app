@@ -1,11 +1,14 @@
 # Routes
-from flask import request, jsonify, session
+from flask import request, jsonify, session, send_from_directory
 from config import app, db, bcrypt, server_session
 from models import User, Draft, Player
+from werkzeug.utils import secure_filename
 import pandas as pd
+import os
 from kmeans import group1, group2, group3, group4, group5
 import random, math
 
+# User APIs
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -55,7 +58,44 @@ def logout():
     session.pop('user_id')
     return jsonify({'message': 'Successfully logged out'}), 200
 
+@app.route('/update_username', methods=['POST'])
+def update_username():
+    data = request.get_json()
+    new_username = data['username']
+    if not new_username or len(new_username) < 4 or len(new_username) > 20:
+        return jsonify({'message': 'New username must be between 4 and 20 characters'}), 400
+    if User.query.filter_by(username=new_username).first():
+        return jsonify({'message': 'Username already exists'}), 400
+    
+    user_id = session.get("user_id")
+    user = User.query.filter_by(id=user_id).first()
+    user.username = new_username
+    db.session.commit()
+    return jsonify({'message': 'Username updated successfully'}), 200
 
+@app.route('/upload_profile_photo', methods=['POST'])
+def upload_profile_photo():
+    if 'file' not in request.files:
+        return jsonify({'message': 'No file part'}), 400
+    
+    file = request.files['file']
+    if not file or file.filename == '':
+        return jsonify({'message': 'No file recieved'}), 400
+    
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        user_id = session.get("user_id")
+        user = User.query.filter_by(id=user_id).first()
+        user.profile_pic = f"/uploads/{filename}"
+        db.session.commit()
+        return jsonify({'message': 'File uploaded successfully'}), 200
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Validates whether or not the database worked
 @app.route('/players', methods=['GET'])
@@ -93,9 +133,7 @@ def delete_drafts():
         db.session.rollback()
         return jsonify({'message': 'An error occurred while deleting drafts', 'error': str(e)}), 500
 
-
-
-
+# Draft APIs
 @app.route('/provide_draft', methods=['GET'])
 def provide_draft():
     players = []
@@ -155,6 +193,7 @@ def delete_draft():
     db.session.commit()
     return jsonify({'message': 'draft deleted successfully'}), 200
 
+# Specific player information
 @app.route('/get_player', methods=['POST'])
 def get_player():
     data = request.get_json()

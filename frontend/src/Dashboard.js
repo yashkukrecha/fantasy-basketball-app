@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faTrash } from "@fortawesome/free-solid-svg-icons";
+import LoadingIcons from "react-loading-icons";
 
 const Dashboard = () => {
   const backend = process.env.REACT_APP_BACKEND_URL;
@@ -10,12 +11,18 @@ const Dashboard = () => {
   const { auth, logout } = useAuth();
   const [drafts, setDrafts] = useState([]);
   const [bestDraft, setBestDraft] = useState(0);
+  const [username, setUsername] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
 
   useEffect(() => {
     if (!auth.user) {
       navigate("/");
       return;
+    } else {
+      setUsername(auth.user.username);
+      setProfilePic(`${backend}${auth.user.profile_pic}`);
     }
+
     // Get all the drafts for the user
     fetch(`${backend}/get_all_drafts`, {
       method: "GET",
@@ -110,16 +117,31 @@ const Dashboard = () => {
     </li>
   ));
 
+  if (!username) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <LoadingIcons.ThreeDots />
+      </div>
+    );
+  }
+
   return (
     <div className="column-container">
       <h1> Dashboard </h1>
       <img
-        src={require("./icons/default-pfp.png")}
+        src={profilePic || require("./icons/default-pfp.png")}
         alt="user profile"
         id="dashboard-pfp"
         onClick={() => navigate("/profile")}
       />
-      {auth.user && <h3> {auth.user.username}'s drafts: </h3>}
+      <h3> {username}'s drafts: </h3>
       {bestDraft !== 0 && <p>(Click on a draft to learn more)</p>}
       <br></br>
       <ul className="draftul">{draftItems}</ul>

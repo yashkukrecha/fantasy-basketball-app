@@ -4,6 +4,7 @@ Flask-Cors
 Flask-Login     
 Flask-Session     
 Flask-SQLAlchemy
+Flask-Migrate
 joblib
 matplotlib
 numpy

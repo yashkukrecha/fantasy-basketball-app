@@ -1,9 +1,10 @@
 # Routes
 from flask import request, jsonify, session, send_from_directory
-from config import app, db, bcrypt, server_session
+from config import app, db, bcrypt, server_session, bucket
 from models import User, Draft, Player
 from werkzeug.utils import secure_filename
 import pandas as pd
+import uuid
 import os
 from kmeans import group1, group2, group3, group4, group5
 import random, math
@@ -83,15 +84,23 @@ def upload_profile_photo():
         return jsonify({'message': 'No file recieved'}), 400
     
     if file:
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-
+        # delete the old pfp
         user_id = session.get("user_id")
         user = User.query.filter_by(id=user_id).first()
-        user.profile_pic = f"/uploads/{filename}"
+        old_filename = user.profile_pic.split('/')[-1]
+        old_blob = bucket.blob(f"profile_pictures/{old_filename}")
+        if old_blob.exists():
+            old_blob.delete()
+
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4()}_{filename}"
+        blob = bucket.blob(f"profile_pictures/{unique_filename}")
+        blob.upload_from_file(file, content_type=file.content_type)
+        blob.make_public()
+        # update the new pfp
+        user.profile_pic = blob.public_url
         db.session.commit()
-        return jsonify({'message': 'File uploaded successfully'}), 200
+        return jsonify({'message': 'File uploaded successfully', 'image_url': blob.public_url}), 200
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

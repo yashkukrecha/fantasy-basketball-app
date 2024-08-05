@@ -21,9 +21,10 @@ const ProfilePage = (props) => {
       navigate("/");
       return;
     } else {
+      console.log(auth.user);
       setUsername(auth.user.username);
       setOriginalUsername(auth.user.username);
-      setProfilePic(`${backend}${auth.user.profile_pic}`);
+      setProfilePic(auth.user.profile_pic);
     }
   }, []);
 
@@ -74,7 +75,7 @@ const ProfilePage = (props) => {
     });
     const data = await response.json();
     if (response.status === 200) {
-      setProfilePic(`${backend}${data.image_url}`);
+      setProfilePic(data.image_url);
     } else {
       setError("Error: " + data.message);
     }

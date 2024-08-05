@@ -30,6 +30,7 @@
 /backend/instance/
 /backend/migrations/
 /backend/.env
+/backend/fantasy-basketball-cfb4d-firebase-adminsdk-gtoe5-12d7e1d53a.json
 /backend/*.pyc
 /backend/*.pyo
 /backend/*.pyd

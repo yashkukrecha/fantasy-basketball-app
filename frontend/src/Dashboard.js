@@ -20,7 +20,7 @@ const Dashboard = () => {
       return;
     } else {
       setUsername(auth.user.username);
-      setProfilePic(`${backend}${auth.user.profile_pic}`);
+      setProfilePic(auth.user.profile_pic);
     }
 
     // Get all the drafts for the user

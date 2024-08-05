@@ -7,7 +7,7 @@ const HomePage = (props) => {
   return (
     <div className="column-container" style={{ overflow: "hidden" }}>
       <h1 id="title"> Fantasy Basketball </h1>
-      <p> A dynamic application that predicts your drafted team's future.</p>
+      <p>A fantasy basketball application that predicts your drafted team's future.</p>
       <div className="row-container">
         <button onClick={() => navigate("/login")}> Login </button>
         <button onClick={() => navigate("/register")}> Register </button>

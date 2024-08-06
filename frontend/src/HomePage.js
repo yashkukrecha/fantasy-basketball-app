@@ -6,7 +6,7 @@ const HomePage = (props) => {
   const navigate = useNavigate();
   return (
     <div className="column-container" style={{ overflow: "hidden" }}>
-      <h1 id="title"> Fantasy Basketball </h1>
+      <h1 id="title"> HoopVision </h1>
       <p>A fantasy basketball application that predicts your drafted team's future.</p>
       <div className="row-container">
         <button onClick={() => navigate("/login")}> Login </button>

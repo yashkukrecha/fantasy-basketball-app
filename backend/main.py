@@ -3,11 +3,14 @@ from flask import request, jsonify, session, send_from_directory
 from config import app, db, bcrypt, server_session, bucket
 from models import User, Draft, Player
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 import pandas as pd
 import uuid
 import os
 from kmeans import group1, group2, group3, group4, group5
 import random, math
+
+load_dotenv()
 
 # User APIs
 @app.route('/register', methods=['POST'])
@@ -210,6 +213,9 @@ def get_player():
     player = Player.query.filter_by(id=player_id).first().to_json()
     return jsonify({'player': player}), 200
 
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, 'index.html') 
 
 if __name__ == "__main__":
     # Creating the databases and adding the player information
@@ -238,4 +244,4 @@ if __name__ == "__main__":
                 db.session.add(player)
             db.session.commit()
     # Running the app
-    app.run(debug=True)
+    app.run()

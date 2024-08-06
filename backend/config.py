@@ -10,9 +10,9 @@ from flask_migrate import Migrate
 import firebase_admin
 from firebase_admin import credentials, storage
 
-app = Flask(__name__)
 load_dotenv()
 
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
 CORS(app, supports_credentials=True)
 app.config['CORS_HEADERS'] = 'application/json'
 

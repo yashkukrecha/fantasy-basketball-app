@@ -22,7 +22,7 @@ the model accurately predicts future averages for each player.
 
 *Model predictions*
 
-* **User and Data Management**: HoopVision includes robust user authentication and relational database management features. The application has three databases: users, players, and drafts. User data includes their user ID, username, password, profile picture, and drafts. 
+* **User and Data Management**: HoopVision includes robust user authentication and relational database management features. The application has three databases: users, players, and drafts. User data includes their user ID, username, password, profile picture, and drafts. Users are logged in using server-side authentication using Redis, where each user will have a session ID that authorizes them.
 The profile pictures are stored in a bucket using Firebase Storage. Player data includes a player ID, basic player information, statistics from the previous season, and predictions for the upcoming NBA season. Lastly, draft data consists of the draft ID,
 user ID, five player IDs, and the success level for the draft.
 
@@ -41,7 +41,7 @@ user ID, five player IDs, and the success level for the draft.
 ![image](https://github.com/user-attachments/assets/6d452959-5b77-4afc-9697-afc78890d4da)
 
 ## Technologies Used
-* **Backend**: Flask
+* **Backend**: Flask, Redis
 * **Frontend**: React.js, Chart.js
 * **Machine Learning**: Sci-Kit Learn, Pandas, Seaborn, Matplotlib
 * **Database and Storage**: SQLAlchemy, Firebase Storage
